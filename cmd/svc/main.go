@@ -25,11 +25,14 @@ func main() {
 		os.Exit(1)
 	}()
 
+	// create the service endpoint
 	api, err := svc.New()
 	if err != nil {
 		os.Exit(1)
 	}
+	// add basic routes
 	api.AddDefaultEndpoints()
-	api.ServeStaticAssets("/", "public")
+	api.ServeStaticAssets("/", "./cmd/svc/public")
+	// add the router to a server on $PORT
 	api.Start()
 }
