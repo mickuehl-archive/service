@@ -32,7 +32,7 @@ func main() {
 	}
 	// add basic routes
 	api.AddDefaultEndpoints()
-	api.ServeStaticAssets("/", "./cmd/svc/public")
+	api.ServeStaticAssets("/", "./example/public")
 	// add the router to a server on $PORT
 	api.Start()
 }
