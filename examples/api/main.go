@@ -47,7 +47,7 @@ func main() {
 
 	// add basic routes
 	svc.AddDefaultEndpoints()
-	svc.ServeStaticAssets("/", "./example/public")
+	svc.ServeStaticAssets("/", "./examples/api/public")
 
 	// add custom endpoints with authentication
 	api := svc.SecureGroup("/api", a.MiddlewareFunc())
