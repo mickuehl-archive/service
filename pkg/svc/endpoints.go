@@ -30,6 +30,11 @@ func StandardAPIResponse(c *gin.Context, err error) {
 	}
 }
 
+// StandardNoRouteResponse is the default response to unknown routes
+func StandardNoRouteResponse(c *gin.Context) {
+	c.JSON(http.StatusNotFound, gin.H{"status": "error", "msg": "page not found"})
+}
+
 // StandardJSONResponse is the default way to respond to API requests
 func StandardJSONResponse(c *gin.Context, res interface{}, err error) {
 	if err == nil {
