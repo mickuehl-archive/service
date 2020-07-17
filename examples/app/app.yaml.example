@@ -9,9 +9,12 @@ handlers:
   secure: always
 
 env_variables:
+  PLATFORM: 'gae'
+  SECRET: supersupersecret
   # google
   PROJECT_ID: 'xoxo'
   LOCATION_ID: 'europe-west3'
+  SERVICE_NAME: 'default'
   # slack
   SLACK_APP_ID: 'xoxo'
   SLACK_CLIENT_ID: 'xoxo'

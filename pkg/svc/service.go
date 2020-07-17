@@ -1,12 +1,10 @@
 package svc
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/txsvc/commons/pkg/errors"
 	"github.com/txsvc/service/pkg/static"
 )
 
@@ -14,7 +12,6 @@ type (
 	// APIService abstracts an API endpoint
 	APIService struct {
 		router       *gin.Engine
-		addr         string
 		scopeMapping map[string]string // format: METHOD+PATH -> SCOPE
 	}
 
@@ -31,20 +28,6 @@ var service *APIService
 func init() {
 	// basic http stack config
 	gin.DisableConsoleColor()
-	// make sure the service is not initialized
-	service = nil
-}
-
-// New creates a new service instance on addr. Only one instance per process is supported!
-func New(addr ...string) error {
-	localAddr := "0.0.0.0:8080"
-	if addr == nil && len(addr) > 0 {
-		localAddr = addr[0]
-	}
-	if service != nil {
-		return errors.New(fmt.Sprintf("A router for this address already exists: %s", localAddr))
-	}
-
 	// a new router
 	r := gin.New()
 	// Recovery middleware recovers from any panics and writes a 500 if there was one.
@@ -52,12 +35,9 @@ func New(addr ...string) error {
 
 	s := &APIService{
 		router:       r,
-		addr:         localAddr,
 		scopeMapping: make(map[string]string),
 	}
 	service = s
-
-	return nil
 }
 
 // AddDefaultEndpoints adds a couple of simple handlers to the router
@@ -77,7 +57,12 @@ func ServeStaticAssets(path, dir string) {
 
 // Start attaches the router to a server. This function blocks!
 func Start() {
-	service.router.Run(service.addr)
+	service.router.Run()
+}
+
+// Use adds a middleware to the router
+func Use(handler gin.HandlerFunc) {
+	service.router.Use(handler)
 }
 
 // Group creates a new router group
