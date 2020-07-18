@@ -16,8 +16,12 @@ stuff.md
 hack/
 *.txt
 # possible binaries
-cmd/svc/svc
-cmd/svc/main
+cmd/token/token
+
+# web assets
+examples/web/public
+.cache
+node_modules
 
 # MAY CONTAIN SECRETS
 app.yaml

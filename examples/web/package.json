@@ -1,44 +1,31 @@
 {
-  "name": "gatsby-absurd",
+  "name": "gatsby-starter-hello-world",
   "private": true,
-  "description": "An absurd starter for Gatsby",
+  "description": "A simplified bare-bones starter for Gatsby",
   "version": "0.1.0",
-  "author": "Ajay NS <ajay.ns@outlook.com>",
-  "dependencies": {
-    "@svgr/webpack": "^4.1.0",
-    "gatsby": "^2.0.76",
-    "gatsby-image": "^2.0.20",
-    "gatsby-plugin-alias-imports": "^1.0.5",
-    "gatsby-plugin-google-fonts": "^0.0.4",
-    "gatsby-plugin-manifest": "^2.0.9",
-    "gatsby-plugin-offline": "^2.0.16",
-    "gatsby-plugin-react-helmet": "^3.0.2",
-    "gatsby-plugin-sharp": "^2.6.11",
-    "gatsby-plugin-styled-components": "^3.0.7",
-    "gatsby-plugin-svgr": "^2.0.1",
-    "gatsby-source-filesystem": "^2.0.8",
-    "gatsby-transformer-sharp": "^2.1.8",
-    "prop-types": "^15.6.2",
-    "react": "^16.6.3",
-    "react-anchor-link-smooth-scroll": "^1.0.11",
-    "react-collapsible": "^2.6.0",
-    "react-dom": "^16.6.3",
-    "react-helmet": "^5.2.0",
-    "react-scrollspy": "^3.3.5",
-    "styled-components": "^4.1.3"
-  },
-  "keywords": [
-    "gatsby"
-  ],
-  "license": "MIT",
+  "license": "0BSD",
   "scripts": {
     "build": "gatsby build",
-    "dev": "gatsby develop",
-    "start": "npm run dev",
-    "format": "prettier --write \"src/**/*.js\"",
-    "clean": "rm -rf .cache && rm -rf public"
+    "develop": "gatsby develop",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "start": "npm run develop",
+    "serve": "gatsby serve",
+    "clean": "gatsby clean",
+    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
+  },
+  "dependencies": {
+    "gatsby": "^2.23.12",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0"
   },
   "devDependencies": {
-    "prettier": "^1.15.2"
+    "prettier": "2.0.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gatsbyjs/gatsby-starter-hello-world"
+  },
+  "bugs": {
+    "url": "https://github.com/gatsbyjs/gatsby/issues"
   }
 }
