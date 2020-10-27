@@ -1,93 +1,109 @@
 package auth
 
 import (
+	"context"
+	"fmt"
 	"strings"
-	"time"
 
-	"github.com/gin-gonic/gin"
-	"github.com/txsvc/service/pkg/jwt"
-	"github.com/txsvc/service/pkg/svc"
+	"cloud.google.com/go/datastore"
+
+	"github.com/txsvc/commons/pkg/env"
+	"github.com/txsvc/platform/pkg/platform"
 )
 
 type (
-
 	// Authorization represents a user, app or bot and its permissions
 	Authorization struct {
-		ClientID  string `json:"client_id" binding:"required"`
-		Name      string `json:"name"` // name of the domain, realm, tennant etc
+		ClientID  string `json:"client_id" binding:"required"` // UNIQUE
+		Name      string `json:"name"`                         // name of the domain, realm, tennant etc
 		Token     string `json:"token" binding:"required"`
 		TokenType string `json:"token_type" binding:"required"` // user,app,bot
-		UserID    string `json:"user_id"`                       // depends on TokenType. UserID could equal ClientID
+		UserID    string `json:"user_id"`                       // depends on TokenType. UserID could equal ClientID or BotUSerID in Slack
 		Scope     string `json:"scope"`                         // a comma separated list of scopes, see below
 		Expires   int64  `json:"expires"`                       // 0 = never
 		// internal
-		Created int64 `json:"-"`
-		Updated int64 `json:"-"`
-	}
-
-	// Client represents the claim of the client calling the API
-	Client struct {
-		ClientID string `json:"client_id"`
-		UserID   string `json:"user_id"`
-		Scope    string `json:"scope"`
+		AuthType string `json:"-"` // currently: jwt, slack
+		Created  int64  `json:"-"`
+		Updated  int64  `json:"-"`
 	}
 )
 
+/*
+Slack:
+AuthorizationDS struct {
+		ID          string -> ClientID
+		Name        string
+		AccessToken string -> Token
+		TokenType   string
+		AppID       string
+		BotUserID   string -> UserID
+		Scope       string
+		// internal
+		Created int64
+		Updated int64
+	}
+*/
 const (
-	identityKey = "client_id"
+	// DatastoreAuthorizations collection AUTHORIZATION
+	DatastoreAuthorizations string = "AUTHORIZATIONS"
 )
 
-// GetSecureJWTMiddleware instantiates a JWT middleware and all the necessary handlers
-func GetSecureJWTMiddleware(realm, secretKey string) (*jwt.GinJWTMiddleware, error) {
-	return jwt.New(&jwt.GinJWTMiddleware{
-		Realm: realm,
-		Key:   []byte(secretKey),
-		//Timeout:         timeout,
-		//MaxRefresh:      maxRefresh,
-		IdentityKey:     identityKey,
-		PayloadFunc:     PayloadMappingHandler,
-		IdentityHandler: IdentityHandler,
-		Authenticator:   nil, // none provided as we do not have a 'login' function for API clients
-		Authorizator:    ScopeAuthorizationHandler,
-		//Unauthorized:    Unauthorized,
-		TokenLookup:   "header: Authorization, query: token, cookie: jwt",
-		TokenHeadName: "Bearer",
-		TimeFunc:      time.Now,
-	})
+// GetToken returns the oauth token of the workspace integration
+func GetToken(ctx context.Context, clientID, authType string) (string, error) {
+	// ENV always overrides anything else ...
+	token := env.Getenv(strings.ToUpper(fmt.Sprintf("%s_AUTH_TOKEN", authType)), "")
+	if token != "" {
+		return token, nil
+	}
+
+	// check the in-memory cache
+	key := namedKey(clientID, authType)
+	token, _ = platform.GetKV(ctx, key)
+	if token != "" {
+		return token, nil
+	}
+
+	auth, err := GetAuthorization(ctx, clientID, authType)
+	if err != nil {
+		return "", err
+	}
+
+	// add the token to the cache
+	platform.SetKV(ctx, key, auth.Token, 1800)
+
+	return auth.Token, nil
 }
 
-// PayloadMappingHandler extracts the client_id, user_id and scope of the request
-func PayloadMappingHandler(data interface{}) jwt.MapClaims {
-	if v, ok := data.(*Client); ok {
-		return jwt.MapClaims{
-			"client_id": v.ClientID,
-			"user_id":   v.UserID,
-			"scope":     v.Scope,
-		}
+// GetAuthorization looks for an authorization
+func GetAuthorization(ctx context.Context, clientID, authType string) (*Authorization, error) {
+	var auth Authorization
+	k := authorizationKey(clientID, authType)
+
+	if err := platform.DataStore().Get(ctx, k, &auth); err != nil {
+		return nil, err
 	}
-	return jwt.MapClaims{}
+
+	return &auth, nil
 }
 
-// IdentityHandler returns the Client structure
-func IdentityHandler(c *gin.Context) interface{} {
-	claims := jwt.ExtractClaims(c)
-	if claims[identityKey] == "" {
-		// FIXME see Issue #170, check if identityKey exists in claims
-		return nil
-	}
-	return &Client{
-		ClientID: claims[identityKey].(string),
-		UserID:   claims["user_id"].(string),
-		Scope:    claims["scope"].(string),
-	}
+// CreateAuthorization creates all data needed for the OAuth fu
+func CreateAuthorization(ctx context.Context, auth *Authorization) error {
+	k := authorizationKey(auth.ClientID, auth.AuthType)
+
+	// remove the entry from the cache if it is already there ...
+	platform.InvalidateKV(ctx, namedKey(auth.ClientID, auth.AuthType))
+
+	// we simply overwrite the existing authorization. If this is no desired, use GetAuthorization first,
+	// update the Authorization and then write it back.
+	_, err := platform.DataStore().Put(ctx, k, auth)
+	return err
 }
 
-// ScopeAuthorizationHandler checks for required scopes
-func ScopeAuthorizationHandler(data interface{}, c *gin.Context) bool {
-	// FIXME this is a very simple and naive implementation !
-	if v, ok := data.(*Client); ok {
-		rr := svc.GetRequiredScopes(c)
-		return strings.Contains(v.Scope, rr)
-	}
-	return false
+// authorizationKey creates a datastore key for a workspace authorization based on the team_id.
+func authorizationKey(clientID, authType string) *datastore.Key {
+	return datastore.NameKey(DatastoreAuthorizations, namedKey(clientID, authType), nil)
+}
+
+func namedKey(clientID, authType string) string {
+	return authType + "." + clientID
 }

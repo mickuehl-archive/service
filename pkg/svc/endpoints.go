@@ -18,7 +18,7 @@ func RobotsEndpoint(c *gin.Context) {
 
 	// a simple robots.txt file, disallow the API
 	c.Writer.Write([]byte("User-agent: *\n\n"))
-	c.Writer.Write([]byte("Disallow: /a/\n")) // FIXME make this configurable, e.g. using ROBOTS_TXT env
+	c.Writer.Write([]byte("Disallow: /a/\n")) // FIXME: make this configurable, e.g. using ROBOTS_TXT env
 }
 
 // StandardAPIResponse is the default way to respond to API requests

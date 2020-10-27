@@ -44,8 +44,8 @@ func init() {
 func AddDefaultEndpoints() {
 	// default static endpoints
 	service.router.GET("/robots.txt", RobotsEndpoint)
-	service.router.GET("/ads.txt", NullEndpoint)    // FIXME change to the real handler
-	service.router.GET("/humans.txt", NullEndpoint) // FIXME change to the real handler
+	service.router.GET("/ads.txt", NullEndpoint)    // FIXME: change to the real handler
+	service.router.GET("/humans.txt", NullEndpoint) // FIXME: change to the real handler
 	service.router.NoRoute(StandardNoRouteResponse)
 }
 
@@ -83,17 +83,17 @@ func SecureGroup(relativePath string, secureHandler gin.HandlerFunc) *SecureRout
 
 // GetRequiredScopes returns the required scopes/scopes for this request or an empty string if none are required
 func GetRequiredScopes(c *gin.Context) string {
-	// FIXME just a naive implementation, optimizations etc
+	// FIXME: just a naive implementation, optimizations etc
 	return service.getRequiredScopes(c.Request.Method, c.FullPath())
 }
 
 func (s *APIService) registerSecureRoute(method, path, scope string) {
-	// FIXME just a naive implementation, no safety net!
+	// FIXME: just a naive implementation, no safety net!
 	s.scopeMapping[method+path] = scope
 }
 
 func (s *APIService) getRequiredScopes(method, path string) string {
-	// FIXME just a naive implementation, no safety net!
+	// FIXME: just a naive implementation, no safety net!
 	return s.scopeMapping[method+path]
 }
 
