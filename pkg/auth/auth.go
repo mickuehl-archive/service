@@ -28,24 +28,14 @@ type (
 	}
 )
 
-/*
-Slack:
-AuthorizationDS struct {
-		ID          string -> ClientID
-		Name        string
-		AccessToken string -> Token
-		TokenType   string
-		AppID       string
-		BotUserID   string -> UserID
-		Scope       string
-		// internal
-		Created int64
-		Updated int64
-	}
-*/
 const (
 	// DatastoreAuthorizations collection AUTHORIZATION
 	DatastoreAuthorizations string = "AUTHORIZATIONS"
+
+	// AuthTypeJWT constant jwt
+	AuthTypeJWT = "jwt"
+	// AuthTypeSlack constant salack
+	AuthTypeSlack = "slack"
 )
 
 // GetToken returns the oauth token of the workspace integration
