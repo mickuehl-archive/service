@@ -41,7 +41,7 @@ const (
 // GetToken returns the oauth token of the workspace integration
 func GetToken(ctx context.Context, clientID, authType string) (string, error) {
 	// ENV always overrides anything else ...
-	token := env.Getenv(strings.ToUpper(fmt.Sprintf("%s_AUTH_TOKEN", authType)), "")
+	token := env.GetString(strings.ToUpper(fmt.Sprintf("%s_AUTH_TOKEN", authType)), "")
 	if token != "" {
 		return token, nil
 	}
