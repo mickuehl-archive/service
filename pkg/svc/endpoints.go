@@ -35,6 +35,11 @@ func StandardNoRouteResponse(c *gin.Context) {
 	c.JSON(http.StatusNotFound, gin.H{"status": "error", "msg": "page not found"})
 }
 
+// StandardNotAuthorizedResponse is the default response to unknown routes
+func StandardNotAuthorizedResponse(c *gin.Context) {
+	c.JSON(http.StatusUnauthorized, gin.H{"status": "error", "msg": "not authorized"})
+}
+
 // StandardJSONResponse is the default way to respond to API requests
 func StandardJSONResponse(c *gin.Context, res interface{}, err error) {
 	if err == nil {
