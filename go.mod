@@ -18,5 +18,6 @@ require (
 	golang.org/x/net v0.0.0-20201216054612-986b41b23924 // indirect
 	golang.org/x/sys v0.0.0-20201214210602-f9fddec55a1e // indirect
 	golang.org/x/tools v0.0.0-20201215192005-fa10ef0b8743 // indirect
+	google.golang.org/appengine v1.6.7
 	google.golang.org/genproto v0.0.0-20201214200347-8c77b98c765d // indirect
 )

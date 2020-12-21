@@ -11,23 +11,6 @@ import (
 	"github.com/txsvc/platform/pkg/platform"
 )
 
-type (
-	// Authorization represents a user, app or bot and its permissions
-	Authorization struct {
-		ClientID  string `json:"client_id" binding:"required"` // UNIQUE
-		Name      string `json:"name"`                         // name of the domain, realm, tennant etc
-		Token     string `json:"token" binding:"required"`
-		TokenType string `json:"token_type" binding:"required"` // user,app,bot
-		UserID    string `json:"user_id"`                       // depends on TokenType. UserID could equal ClientID or BotUSerID in Slack
-		Scope     string `json:"scope"`                         // a comma separated list of scopes, see below
-		Expires   int64  `json:"expires"`                       // 0 = never
-		// internal
-		AuthType string `json:"-"` // currently: jwt, slack
-		Created  int64  `json:"-"`
-		Updated  int64  `json:"-"`
-	}
-)
-
 const (
 	// DatastoreAuthorizations collection AUTHORIZATION
 	DatastoreAuthorizations string = "AUTHORIZATIONS"
@@ -74,6 +57,11 @@ func GetAuthorization(ctx context.Context, clientID, authType string) (*Authoriz
 	}
 
 	return &auth, nil
+}
+
+// FindAuthorization looks for an authorization by token
+func FindAuthorization(ctx context.Context, token string) (*Authorization, error) {
+	return nil, nil
 }
 
 // CreateAuthorization creates all data needed for the OAuth fu
