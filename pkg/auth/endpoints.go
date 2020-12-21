@@ -66,14 +66,13 @@ func CreateJWTAuthorizationEndpoint(c *gin.Context) {
 // ValidateJWTAuthorizationEndpoint verifies that the token is valid and exists in the authorization table
 func ValidateJWTAuthorizationEndpoint(c *gin.Context) {
 	token := GetBearerToken(c)
-
 	if token == "" {
 		c.Status(http.StatusUnauthorized)
 		return
 	}
 
 	auth, err := FindAuthorization(appengine.NewContext(c.Request), token)
-	if err != nil {
+	if auth == nil || err != nil {
 		c.Status(http.StatusUnauthorized)
 		return
 	}

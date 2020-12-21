@@ -61,13 +61,15 @@ func GetAuthorization(ctx context.Context, clientID, authType string) (*Authoriz
 
 // FindAuthorization looks for an authorization by token
 func FindAuthorization(ctx context.Context, token string) (*Authorization, error) {
-	var auth Authorization
+	var auth []*Authorization
 
-	q := datastore.NewQuery(DatastoreAuthorizations).Filter("Token =", token).Limit(1)
-	if _, err := platform.DataStore().GetAll(ctx, q, &auth); err != nil {
+	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreAuthorizations).Filter("Token =", token), &auth); err != nil {
 		return nil, err
 	}
-	return &auth, nil
+	if auth == nil {
+		return nil, nil
+	}
+	return auth[0], nil
 }
 
 // CreateAuthorization creates all data needed for the OAuth fu
