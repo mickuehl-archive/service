@@ -9,6 +9,7 @@ import (
 
 	"github.com/txsvc/commons/pkg/env"
 	"github.com/txsvc/platform/pkg/platform"
+	s "github.com/txsvc/platform/pkg/services"
 )
 
 const (
@@ -31,7 +32,7 @@ func GetToken(ctx context.Context, clientID, authType string) (string, error) {
 
 	// check the in-memory cache
 	key := namedKey(clientID, authType)
-	token, _ = platform.GetKV(ctx, key)
+	token, _ = s.GetKV(ctx, key)
 	if token != "" {
 		return token, nil
 	}
@@ -42,7 +43,7 @@ func GetToken(ctx context.Context, clientID, authType string) (string, error) {
 	}
 
 	// add the token to the cache
-	platform.SetKV(ctx, key, auth.Token, 1800)
+	s.SetKV(ctx, key, auth.Token, 1800)
 
 	return auth.Token, nil
 }
@@ -77,7 +78,7 @@ func CreateAuthorization(ctx context.Context, auth *Authorization) error {
 	k := authorizationKey(auth.ClientID, auth.AuthType)
 
 	// remove the entry from the cache if it is already there ...
-	platform.InvalidateKV(ctx, namedKey(auth.ClientID, auth.AuthType))
+	s.InvalidateKV(ctx, namedKey(auth.ClientID, auth.AuthType))
 
 	// we simply overwrite the existing authorization. If this is no desired, use GetAuthorization first,
 	// update the Authorization and then write it back.
