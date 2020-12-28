@@ -41,7 +41,7 @@ func testAPIResponse(c *gin.Context) {
 
 func main() {
 	// used to secure cookies and sign the JWT token
-	secret := env.GetString("SECRET", "supersecretsecret")
+	secret := env.GetString("MASTER_KEY", "supersecretsecret")
 
 	// create the JWT middleware
 	a, err := auth.GetSecureJWTMiddleware("svcexample", secret)
