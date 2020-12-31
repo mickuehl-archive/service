@@ -11,6 +11,10 @@ import (
 	"github.com/txsvc/service/pkg/svc"
 )
 
+func init() {
+	gin.SetMode(gin.ReleaseMode)
+}
+
 // CreateJWTAuthorizationEndpoint creates an JWT authorization
 func CreateJWTAuthorizationEndpoint(c *gin.Context) {
 	var ar AuthorizationRequest
