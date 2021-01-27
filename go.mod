@@ -10,6 +10,6 @@ require (
 	github.com/gin-gonic/gin v1.6.3
 	github.com/gorilla/sessions v1.2.1 // indirect
 	github.com/txsvc/commons v1.1.0
-	github.com/txsvc/platform v1.1.0
+	github.com/txsvc/platform v1.1.1
 	google.golang.org/appengine v1.6.7
 )
